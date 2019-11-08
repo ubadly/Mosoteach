@@ -103,51 +103,70 @@ class Mosoteach():
         videos = []
         mosoinks = []
         images = []
+        texts = []
         result = {}
         number = len(divs)
+        # n = 0
         for div in divs:
             audios_dict = {}
             applications_dict = {}
             mosoinks_dict = {}
             videos_dict = {}
             images_dict = {}
+            texts_dict = {}
             type = div.xpath('./@data-mime')[0]#类型
             url = div.xpath('./@data-href')[0]#文件链接
             title = div.xpath('./div[4]/div[1]/span/text()')[0]#文件标题
             data_value = div.xpath('./@data-value')[0]#文件id
-            if type == 'image':
-                images_dict['data_value'] = data_value
-                images_dict['title'] = title
-                images_dict['url'] = url
-                images.append(images_dict)
-            elif type == 'application':
-                applications_dict['data_value'] = data_value
-                applications_dict['title'] = title
-                applications_dict['url'] = url
-                applications.append(applications_dict)
-            elif type == 'audio':
-                audios_dict['data_value'] = data_value
-                audios_dict['title'] = title
-                audios_dict['url'] = url
-                audios.append(audios_dict)
-            elif type == 'mosoink':
-                mosoinks_dict['data_value'] = data_value
-                mosoinks_dict['title'] = title
-                mosoinks_dict['url'] = url
-                mosoinks.append(mosoinks_dict)
-            elif type == 'video':
-                videos_dict['data_value'] = data_value
-                videos_dict['title'] = title
-                videos_dict['url'] = url
-                videos.append(videos_dict)
-
-        result['image'] = images
-        result['applications'] = applications
-        result['audios'] = audios
-        result['mosoinks'] = mosoinks
-        result['videos'] = videos
-        result['number'] = number
+            try:
+                status_file = div.xpath('./div[4]/div[2]/span[5]/@style')[0]#文件的状态
+            except:
+                try:
+                    status_file = div.xpath('./div[4]/div[2]/span[3]/@style')[0]  # 文件的状态
+                except:
+                    status_file = div.xpath('./div[4]/div[2]/span[7]/@style')[0]
+            # n+=1
+            # print(n,status_file)
+            if status_file == r'color:#ec6941':
+                if type == 'image':
+                    images_dict['data_value'] = data_value
+                    images_dict['title'] = title
+                    images_dict['url'] = url
+                    images.append(images_dict)
+                elif type == 'application':
+                    applications_dict['data_value'] = data_value
+                    applications_dict['title'] = title
+                    applications_dict['url'] = url
+                    applications.append(applications_dict)
+                elif type == 'audio':
+                    audios_dict['data_value'] = data_value
+                    audios_dict['title'] = title
+                    audios_dict['url'] = url
+                    audios.append(audios_dict)
+                elif type == 'mosoink':
+                    mosoinks_dict['data_value'] = data_value
+                    mosoinks_dict['title'] = title
+                    mosoinks_dict['url'] = url
+                    mosoinks.append(mosoinks_dict)
+                elif type == 'video':
+                    videos_dict['data_value'] = data_value
+                    videos_dict['title'] = title
+                    videos_dict['url'] = url
+                    videos.append(videos_dict)
+                elif type == 'text':
+                    texts_dict['data_value'] = data_value
+                    texts_dict['title'] = title
+                    texts_dict['url'] = url
+                    texts.append(texts_dict)
+                result['image'] = images
+                result['applications'] = applications
+                result['audios'] = audios
+                result['mosoinks'] = mosoinks
+                result['videos'] = videos
+                result['number'] = number
+                result['texts'] = texts
         return result
+
     def _index(self,class_info):
         print('启动班课执行的地方了')
         #读取选择的班课并调用刷课函数
@@ -157,19 +176,24 @@ class Mosoteach():
             data = dat['ID']
             print(f'开始班课：{name}')
             result = self.parse(data)
-            length = result['number']-len(result['videos'])
-            if result['videos']:
-                n = 1
-                for video_info in result['videos']:
-                    print(f'视频进度：{n}/{len(result["videos"])}')
-                    self.video(data,video_info['data_value'],video_info['title'])
-                    n+=1
+            # print(result)
+            if result:
+                length = result['number']-len(result['videos'])
+                if result['videos']:
+                    n = 1
+                    for video_info in result['videos']:
+                        print(f'视频进度：{n}/{len(result["videos"])}')
+                        self.video(data,video_info['data_value'],video_info['title'])
+                        n+=1
+                else:
+                    print('未检测到视频！')
+                ids = result['applications']+result['audios']+result['mosoinks']+result['image']+result['texts']
+                # print(ids)
+                if ids:
+                    self.qingqiu(ids, length)
             else:
-                print('未检测到视频！')
-            ids = result['applications']+result['audios']+result['mosoinks']+result['image']
-            # print(ids)
-            if ids:
-                self.qingqiu(ids, length)
+                print('没有找到可以刷的文件！')
+
 
 
 class PaserDate():
