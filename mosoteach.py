@@ -296,28 +296,6 @@ if __name__ == '__main__':
     os.system('cls')
     welcome()
     main(username,password)
-    # os.system('mode con cols=68 lines=20')
-    # os.system('title 蓝墨云刷分数v2')
-    # urlTZ = 'http://ilusao.cn/moso/mosotz.txt'
-    # tongzhi = requests.get(urlTZ)
-    # if tongzhi.status_code == 200 and tongzhi.text:
-    #     print('通知：')
-    #     tongzhi.encoding = 'utf-8'
-    #     print(tongzhi.text)
-    # capturl = 'http://ilusao.cn/moso/mosouser.txt'
-    # capt = requests.get(capturl)
-    # capt.encoding = 'utf-8'
-    # username = input('学号：')
-    # password = input('密码：')
-    # if '开放' in capt.text or username in capt.text:
-    #     os.system('cls')
-    #     welcome()
-    #     main(username,password)
-    #
-    # else:
-    #     print('免费分享已经到期了哦！')
-    #
-
 
 
 
