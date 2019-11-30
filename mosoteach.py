@@ -133,7 +133,7 @@ class moso():
             choice = list(set(choice.strip(',').split(',')))
             choice.sort()
             try:
-                if int(choice[-1]) > len(classinfo) and int(choice[0]) < 1:
+                if int(choice[-1]) > len(classinfo) or int(choice[0]) < 1:
                     print('看看选择错误了吗？')
                     t = input('回车重新选择...')
                     os.system('cls')
