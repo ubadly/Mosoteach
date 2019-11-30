@@ -5,6 +5,7 @@ class moso():
     def __init__(self):
         self.session = requests.Session()
         self.heasers = {
+            'Connection':'close',
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.75 Safari/537.36',
             'Referer': 'https://www.mosoteach.cn/web/index.php?c=passport&m=index'
         }
@@ -149,13 +150,14 @@ class processfile():
         self.session = session
         self.headers = moso().heasers
         self.clazz_course_id = clazz_course_id
-    def video(self,clazz_id,QvideUrls):
+    def video(self,QvideUrls):
         url = 'https://www.mosoteach.cn/web/index.php?c=res&m=save_watch_to'
         while not QvideUrls.empty():
             try:
-                clazz_course_id = clazz_id
-                res_id = QvideUrls.get_nowait()['res_id']
-                name = QvideUrls.get_nowait()['title']
+                info = QvideUrls.get_nowait()
+                clazz_course_id = info['clazz_course_id']
+                res_id = info['res_id']
+                name = info['title']
                 data = {
                     'clazz_course_id': clazz_course_id,
                     'res_id': res_id,
@@ -165,7 +167,7 @@ class processfile():
                 }
                 try:
                     print(f'正在刷:{name}')
-                    self.session.post(url, data=data, stream=True, timeout=2)
+                    self.session.post(url, data=data, stream=True, timeout=5)
 
                     ####################
                     duration = 100
@@ -176,21 +178,23 @@ class processfile():
                         'duration': duration,
                         'current_watch_to': duration
                     }
-                    self.session.post(url, data=dataa, stream=True, timeout=2)
-                except:
-                    print(f'不知道为啥{name}就失败了！')
-            except:
-                pass
-    def otherfile(self,QotherUrls):
-        while not QotherUrls.empty():
-            try:
-                url = QotherUrls.get_nowait()['url']
-                name = QotherUrls.get_nowait()['title']
-                print(f'正在刷:{name}')
-                self.session.get(url,headers=self.headers,stream=True,timeout=2)
+                    self.session.post(url, data=dataa, stream=True, timeout=5)
+                except Exception as e:
+                    pass
+
             except:
                 pass
 
+    def otherfile(self,QotherUrls):
+        while not QotherUrls.empty():
+            try:
+                info = QotherUrls.get_nowait()
+                url = info['url']
+                name = info['title']
+                print(f'正在刷:{name}')
+                self.session.get(url,headers=self.headers,stream=True,timeout=2)
+            except Exception as e:
+                pass
     def getfiles(self,clazz_id):
         QotherUrls = queue.Queue()
         QvideUrls = queue.Queue()
@@ -204,8 +208,14 @@ class processfile():
                 url = div.xpath('./@data-href')[0]  # 文件链接
                 title = div.xpath('./div[4]/div[1]/span/text()')[0]  # 文件标题
                 data_value = div.xpath('./@data-value')[0]  # 文件id
-                status_file = div.xpath('./div[4]/div[2]/span[5]/@style')[0]  # 文件的状态
-                if status_file == r'color:#ec6941':
+                try:
+                    status_file = div.xpath('./div[4]/div[2]/span[5]/@data-is-drag')[0]  # 文件的状态
+                except:
+                    try:
+                        status_file = div.xpath('./div[4]/div[2]/span[7]/@data-is-drag')[0]  # 文件的状态
+                    except:
+                        status_file = div.xpath('./div[4]/div[2]/span[3]/@data-is-drag')[0]  # 文件的状态
+                if status_file == 'N':
                     if type == 'video':
                         info_vides = {}
                         info_vides['url'] = url
@@ -225,40 +235,35 @@ class processfile():
         if QvideUrls.empty() and QotherUrls.empty():
             print('当前班课没有可刷的文件！')
         else:
-            print(f'当前班课检测到{QvideUrls.qsize()+QotherUrls.qsize()}个文件')
+            print(f'当前班课检测到{QvideUrls.qsize()+QotherUrls.qsize()}个可刷文件')
         if QvideUrls.qsize():
             tasks = []
             # 开启多线程
-            for i in range(1, 31):
+            for v in range(1, threadsum+1):
                 t = threading.Thread(target=self.video, args=(QvideUrls,))
                 tasks.append(t)
             # 批量启动线程
-            for i in tasks:
-                i.start()
+            for vt in tasks:
+                vt.start()
             # 批量阻塞线程
-            for i in tasks:
-                i.join()
+            for ij in tasks:
+                ij.join()
             # self.video(clazz_id,QvideUrls)
         if QotherUrls.qsize():
             tasks = []
             # 开启多线程
-            for i in range(1,31):
+            for o in range(1,threadsum+1):
                 t = threading.Thread(target=self.otherfile,args=(QotherUrls,))
                 tasks.append(t)
             # 批量启动线程
-            for i in tasks:
-                i.start()
+            for ot in tasks:
+                ot.start()
             # 批量阻塞线程
-            for i in tasks:
-                i.join()
-
-
-
-
-
+            for oj in tasks:
+                oj.join()
 def welcome():
     print('''
-那就这样吧
+   那就这样吧
 再爱都曲终人散了
 '''
     )
@@ -291,13 +296,12 @@ def main(username,password):
     else:
         print('登录失败')
 if __name__ == '__main__':
+    # 线程数
+    threadsum = 16
     username = input('学号：')
     password = input('密码：')
     os.system('cls')
     welcome()
     main(username,password)
-
-
-
     t= input('回车退出刷课程序....')
     exit(0)
