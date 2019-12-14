@@ -192,7 +192,7 @@ class processfile():
                 url = info['url']
                 name = info['title']
                 print(f'正在刷:{name}')
-                self.session.get(url,headers=self.headers,stream=True,timeout=2)
+                self.session.head(url,headers=self.headers,timeout=2)
             except Exception as e:
                 pass
     def getfiles(self,clazz_id):
