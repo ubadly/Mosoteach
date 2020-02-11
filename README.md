@@ -7,12 +7,9 @@
 
 执行pip install -r requirements.txt安装所需环境
 
-执行python mosoteach.py即可
+执行python main.py即可
 
-## 注意
-mosotech文件夹的文件没用了，不会删除0.0
 
-加入了多线程，默认16个线程，可自行调整threadnum的值
 
 ## 待解决
 
