@@ -63,6 +63,7 @@ class Clazzcourse:
         }
         self.OtherUrls = []
         self.VideUrls = []
+        self.AudioUrls = []
 
     @property
     def join_class_list(self):
@@ -99,6 +100,13 @@ class Clazzcourse:
                         info_vides['res_id'] = data_value
                         info_vides['title'] = title
                         self.VideUrls.append(info_vides)
+                    elif type == 'audio':
+                        info_audio = {}
+                        info_audio['url'] = url
+                        info_audio['clazz_course_id'] = choice[-1]
+                        info_audio['res_id'] = data_value
+                        info_audio['title'] = title
+                        self.AudioUrls.append(info_audio)
                     else:
                         info_other = {}
                         info_other['url'] = url
@@ -148,8 +156,24 @@ class Clazzcourse:
         except Exception as e:
             self.otherfile(info)
 
+    def audiofile(self, info):
+        try:
+            url = "https://www.mosoteach.cn/web/index.php?c=res&m=request_url_for_json"
+            name = info['title']
+            print(f'正在刷:{name}')
+            data = {
+                "file_id": info['res_id'],
+                "type": "VIEW",
+                "clazz_course_id": info['clazz_course_id']
+            }
+            requests.post(url, headers=self.headers, cookies=self.__cookies, timeout=3, data=data)
+        except Exception as e:
+            self.otherfile(info)
+
     def process_file(self):
         executor_video = ThreadPoolExecutor(max_workers=8)
         executor_video.map(self.video, self.VideUrls)
         executor_other = ThreadPoolExecutor(max_workers=8)
         executor_other.map(self.otherfile, self.OtherUrls)
+        executor_other = ThreadPoolExecutor(max_workers=8)
+        executor_other.map(self.audiofile, self.AudioUrls)

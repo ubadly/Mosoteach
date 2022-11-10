@@ -53,7 +53,7 @@ def main():
         for choice in choices:
             # 将文件放入列表
             course.res_list(choice)
-        if course.OtherUrls or course.VideUrls:
+        if course.OtherUrls or course.VideUrls or course.AudioUrls:
             course.process_file()
         else:
             print('没有可以刷的文件!')
