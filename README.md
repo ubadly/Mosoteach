@@ -16,5 +16,6 @@
 
 执行python main.py即可
 
-
+## 下载连接
+[Releases](https://github.com/xiaoqingfengATGH/mosoteach/releases)
 
