@@ -1,0 +1,78 @@
+name: Build with Nuitka
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        python-version: ['3.12']
+        
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install --upgrade nuitka ordered-set zstandard
+        
+    - name: Build with Nuitka (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        python -m nuitka --assume-yes-for-downloads --onefile --python-flag=no_site --python-flag=no_warnings --remove-output --static-libpython=no --nofollow-imports --follow-import-to=requests,parsel --include-package=requests,parsel --enable-plugin=anti-bloat main.py
+        mv main.exe "mosoteach-${{ github.ref_name }}-windows.exe"
+        
+    - name: Build with Nuitka (MacOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        python -m nuitka --assume-yes-for-downloads --onefile --python-flag=no_site --python-flag=no_warnings --remove-output --static-libpython=no --nofollow-imports --follow-import-to=requests,parsel --include-package=requests,parsel --enable-plugin=anti-bloat main.py
+        mv main.bin "mosoteach-${{ github.ref_name }}-macos"
+        chmod +x "mosoteach-${{ github.ref_name }}-macos"
+        
+    - name: Build with Nuitka (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        python -m nuitka --assume-yes-for-downloads --onefile --python-flag=no_site --python-flag=no_warnings --remove-output --static-libpython=no --nofollow-imports --follow-import-to=requests,parsel --include-package=requests,parsel --enable-plugin=anti-bloat main.py
+        mv main.bin "mosoteach-${{ github.ref_name }}-linux"
+        chmod +x "mosoteach-${{ github.ref_name }}-linux"
+        
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.os }}-build
+        path: |
+          mosoteach-${{ github.ref_name }}-*
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Mosoteach ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        files: |
+          windows-latest-build/mosoteach-${{ github.ref_name }}-windows.exe
+          macos-latest-build/mosoteach-${{ github.ref_name }}-macos
+          ubuntu-latest-build/mosoteach-${{ github.ref_name }}-linux
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
