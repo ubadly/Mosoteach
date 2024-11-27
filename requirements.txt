@@ -1,2 +1,2 @@
-parsel==1.5.2
-requests==2.22.0
+parsel
+requests

@@ -74,3 +74,4 @@ if __name__ == '__main__':
         main()
     else:
         print('乖乖啊,账号或者密码错了!!!')
+    t = input('输入任意键退出>>>')
