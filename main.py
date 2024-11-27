@@ -48,6 +48,7 @@ def get_class_id():
 def main():
     # 清屏
     os.system(systemType)
+    welcome()
     choices = get_class_id()
     if choices:
         for choice in choices:
@@ -66,6 +67,7 @@ def main():
 
 
 if __name__ == '__main__':
+    welcome()
     username = input('手机号或邮箱号>>>')
     password = input('密码>>>')
     cookies = login(username, password)
