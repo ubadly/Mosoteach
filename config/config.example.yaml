@@ -1,0 +1,24 @@
+# 慕课堂助手配置文件示例
+
+# API设置
+api:
+  base_url: "https://www.mosoteach.cn/web/index.php"
+  timeout: 5
+  retry_times: 3
+
+# 下载设置
+download:
+  concurrent_downloads: 3
+  save_path: "./downloads"
+  chunk_size: 8192
+
+# 日志设置
+logging:
+  level: "INFO"
+  file: "mosoteach.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# 用户界面设置
+ui:
+  language: "zh_CN"
+  show_progress_bar: true
