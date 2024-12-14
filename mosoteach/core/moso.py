@@ -1,10 +1,10 @@
 """
-慕课堂核心功能模块
+蓝墨云班课核心功能模块
 
-提供与慕课堂平台交互的核心功能，包括：
+提供与蓝墨云班课平台交互的核心功能，包括：
 - 用户登录
 - 课程信息获取
-- 资源下载等
+- 资源刷课等
 """
 
 import logging
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class MosoteachError(Exception):
-    """慕课堂相关错误的基类"""
+    """蓝墨云班课相关错误的基类"""
     pass
 
 
@@ -35,7 +35,7 @@ class CourseError(MosoteachError):
 
 
 class Loginer:
-    """慕课堂登录类
+    """蓝墨云班课登录类
     
     处理用户登录相关的功能，包括账号密码登录和获取cookies等。
     
@@ -138,8 +138,11 @@ class Course:
         try:
             response = self._session.get(url, timeout=REQUEST_TIMEOUT)
             data = response.json()
+            logger = logging.getLogger(__name__)
+            logger.info(f"班课列表API响应: {data}")
+            
             if data.get('result_code') == 0:
-                return data
+                return data.get('data', [])
             else:
                 error_msg = data.get('result_msg', '未知错误')
                 raise CourseError(f"获取班课列表失败: {error_msg}")
