@@ -33,7 +33,7 @@ def welcome():
     # 准备显示的内容
     title = "Mosoteach 刷课工具"
     subtitle = "蓝墨云班课自动刷课助手"
-    github = "Github: github.com/ubadly/mosoteach"
+    github = "复刻于Github: github.com/ubadly/mosoteach"
     star = "觉得好用请给个 Star ⭐"
     prompt = "请按提示输入相关信息..."
     
