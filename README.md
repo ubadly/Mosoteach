@@ -1,4 +1,9 @@
-```不说不能用就是还能用，有问题记得给我提issues，觉得好用的点个star哦```
+## 2026-04-01
+今天收到一个小兄弟的pr:[#10](https://github.com/ubadly/Mosoteach/pull/10)，得知网站更新了，接口也同步更新了。
+ai时代下，古法编程弥足珍贵。我想要保留之前自己的成长记录，就没有合并他的提交。
+他的改动应该是可以用的，有需要的可以进入他的主页进行查看：[https://github.com/fengkaobanli](https://github.com/fengkaobanli)
+我的这个代码已经失效，无法正常使用，至此结束！
+
 # Mosoteach
 蓝墨云云班课刷分数
 ## 2022-11-10更新
